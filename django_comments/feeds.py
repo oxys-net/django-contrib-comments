@@ -22,7 +22,6 @@ class LatestCommentFeed(Feed):
 
     def items(self):
         qs = django_comments.get_model().objects.filter(
-            site__pk = self.site.pk,
             is_public = True,
             is_removed = False,
         )
