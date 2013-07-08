@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sites.models import Site
+#from django.contrib.sites.models import Site
 from django.core import urlresolvers
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -21,13 +21,13 @@ class BaseCommentAbstractModel(models.Model):
 
     # Content-object field
     content_type = models.ForeignKey(ContentType,
-            verbose_name=_('content type'),
-            related_name="content_type_set_for_%(class)s")
+                                     verbose_name=_('content type'),
+                                     related_name="content_type_set_for_%(class)s")
     object_pk = models.TextField(_('object ID'))
     content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
 
     # Metadata about the comment
-    site = models.ForeignKey(Site)
+    #site = models.ForeignKey(Site, null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -51,8 +51,8 @@ class Comment(BaseCommentAbstractModel):
     # Who posted this comment? If ``user`` is set then it was an authenticated
     # user; otherwise at least user_name should have been set and the comment
     # was posted by a non-authenticated user.
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'),
-                    blank=True, null=True, related_name="%(class)s_comments")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), blank=True, null=True,
+                             related_name="%(class)s_comments")
     user_name = models.CharField(_("user's name"), max_length=50, blank=True)
     user_email = models.EmailField(_("user's email address"), blank=True)
     user_url = models.URLField(_("user's URL"), blank=True)
