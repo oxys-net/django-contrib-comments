@@ -7,8 +7,9 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
-
+from django.conf import settings
 from django_comments.managers import CommentManager
+from . import get_comment_app_name, get_model, DEFAULT_COMMENTS_APP
 
 COMMENT_MAX_LENGTH = getattr(settings, 'COMMENT_MAX_LENGTH', 3000)
 
@@ -43,7 +44,7 @@ class BaseCommentAbstractModel(models.Model):
 
 
 @python_2_unicode_compatible
-class Comment(BaseCommentAbstractModel):
+class CommentAbstractModel(BaseCommentAbstractModel):
     """
     A user comment about some object.
     """
@@ -74,7 +75,7 @@ class Comment(BaseCommentAbstractModel):
     objects = CommentManager()
 
     class Meta:
-        db_table = "django_comments"
+        abstract = True
         ordering = ('submit_date',)
         permissions = [("can_moderate", "Can moderate comments")]
         verbose_name = _('comment')
@@ -161,6 +162,12 @@ class Comment(BaseCommentAbstractModel):
         return _('Posted by %(user)s at %(date)s\n\n%(comment)s\n\nhttp://%(domain)s%(url)s') % d
 
 
+if get_comment_app_name() == DEFAULT_COMMENTS_APP:
+    
+    class Comment(CommentAbstractModel):
+        class Meta:
+            db_table = "django_comments"
+
 @python_2_unicode_compatible
 class CommentFlag(models.Model):
     """
@@ -176,7 +183,7 @@ class CommentFlag(models.Model):
     if you want rating look elsewhere.
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'), related_name="comment_flags")
-    comment = models.ForeignKey(Comment, verbose_name=_('comment'), related_name="flags")
+    comment = models.ForeignKey(get_model(), verbose_name=_('comment'), related_name="flags")
     flag = models.CharField(_('flag'), max_length=30, db_index=True)
     flag_date = models.DateTimeField(_('date'), default=None)
 
