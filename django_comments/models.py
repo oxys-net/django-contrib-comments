@@ -76,10 +76,8 @@ class CommentAbstractModel(BaseCommentAbstractModel):
 
     class Meta:
         abstract = True
-        ordering = ('submit_date',)
         permissions = [("can_moderate", "Can moderate comments")]
-        verbose_name = _('comment')
-        verbose_name_plural = _('comments')
+        
 
     def __str__(self):
         return "%s: %s..." % (self.name, self.comment[:50])
@@ -166,7 +164,10 @@ if get_comment_app_name() == DEFAULT_COMMENTS_APP:
     
     class Comment(CommentAbstractModel):
         class Meta:
+            ordering = ('submit_date',)
             db_table = "django_comments"
+            verbose_name = _('comment')
+            verbose_name_plural = _('comments')
 
 @python_2_unicode_compatible
 class CommentFlag(models.Model):
