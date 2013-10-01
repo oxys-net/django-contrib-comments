@@ -85,7 +85,7 @@ class CommentAbstractModel(BaseCommentAbstractModel):
     def save(self, *args, **kwargs):
         if self.submit_date is None:
             self.submit_date = timezone.now()
-        super(Comment, self).save(*args, **kwargs)
+        super(CommentAbstractModel, self).save(*args, **kwargs)
 
     def _get_userinfo(self):
         """
